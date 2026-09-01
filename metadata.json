@@ -1,0 +1,7 @@
+{
+  "name": "Thocky - Mechanical Keyboard ASMR Simulator",
+  "description": "Real-time mechanical keyboard sound simulator featuring Creamy, Thocky, Clacky, and Poppy switch acoustics with zero latency, customizable pitch/volume, live keystroke HUD overlay, and Windows desktop support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

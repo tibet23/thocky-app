@@ -105,6 +105,7 @@ Thocky is packaged as a Win32 desktop application using the Microsoft Store brid
     npm run build
 
 
+
 ## 📦 Windows AppX Identity Configuration
 
 Configured for automated Windows packaging via `electron-builder` matching official Microsoft Partner Center credentials:
@@ -126,7 +127,7 @@ Configured for automated Windows packaging via `electron-builder` matching offic
     }
   }
 }
-
+```
 
 ## 📄 License & Privacy
 

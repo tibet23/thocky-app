@@ -1,7 +1,7 @@
 {
   "name": "thocky",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Real-time mechanical keyboard sound simulator",
   "author": "Maximus Labs",
   "main": "main.js",
@@ -44,7 +44,8 @@
     "appId": "com.maximuslabs.thocky",
     "productName": "Thocky",
     "directories": {
-      "output": "dist-electron"
+      "output": "dist-electron",
+      "buildResources": "build"
     },
     "files": [
       "dist/**/*",
@@ -59,7 +60,9 @@
       "identityName": "MaximusLabs.Thocky",
       "publisher": "CN=F9B66ACC-8C31-4360-AE8B-D0A167BA1200",
       "publisherDisplayName": "Maximus Labs",
-      "applicationId": "Thocky"
+      "applicationId": "Thocky",
+      "backgroundColor": "#000000",
+      "showNameOnTiles": true
     }
   }
 }

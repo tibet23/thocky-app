@@ -108,13 +108,22 @@ Thocky is packaged as a Win32 desktop application using the Microsoft Store brid
 
 ## 📦 Windows AppX Identity Configuration
 
-Configured for automated Windows packaging via `electron-builder` matching official Microsoft Partner Center credentials:
+Configured for automated Windows packaging via `electron-builder` matching official Microsoft Partner Center credentials, including the required Store tile assets and background formatting:
 
 ```json
 {
   "build": {
     "appId": "com.maximuslabs.thocky",
     "productName": "Thocky",
+    "directories": {
+      "output": "dist-electron",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "main.js",
+      "package.json"
+    ],
     "win": {
       "target": ["appx"],
       "icon": "build/icon.ico"
@@ -123,7 +132,9 @@ Configured for automated Windows packaging via `electron-builder` matching offic
       "identityName": "MaximusLabs.Thocky",
       "publisher": "CN=F9B66ACC-8C31-4360-AE8B-D0A167BA1200",
       "publisherDisplayName": "Maximus Labs",
-      "applicationId": "Thocky"
+      "applicationId": "Thocky",
+      "backgroundColor": "#000000",
+      "showNameOnTiles": true
     }
   }
 }

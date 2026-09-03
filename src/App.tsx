@@ -45,6 +45,9 @@ import { OnboardingModal } from './components/OnboardingModal';
 import { UserTrackingDashboardModal } from './components/UserTrackingDashboardModal';
 import { ThockyBrandIcon } from './components/ThockyBrandIcon';
 
+// Safely access Electron's IPC module without crashing in a web browser
+const ipcRenderer = (window as any).require ? (window as any).require('electron').ipcRenderer : null;
+
 export default function App() {
   // 1-Day (24h) Local Trial State & Auth
   const [trialState, setTrialState] = useState<TrialState>(getTrialState());
@@ -167,6 +170,45 @@ export default function App() {
     [handleUserInteraction, trialState.isExpired, trialState.isSubscribed, currentProfileId, audioSettings]
   );
 
+  // Play Key Up Sound (Top-out return clack)
+  const triggerKeyUpAudio = useCallback(
+    (code: string, category: KeyCategory) => {
+      if (trialState.isExpired) return;
+      soundEngine.triggerKeyUp(code, currentProfileId, category, audioSettings);
+    },
+    [currentProfileId, audioSettings, trialState.isExpired]
+  );
+
+  // Global Background Key Listener (Electron OS Hook)
+  useEffect(() => {
+    if (!ipcRenderer) return;
+
+    const handleGlobalKeyDown = (_event: any, webCode: string) => {
+      const category = getKeyCategory(webCode);
+      setActiveKeys((prev) => new Set(prev).add(webCode));
+      const char = webCode.replace(/(Key|Digit)/, '');
+      triggerKeyAudio(webCode, category, char);
+    };
+
+    const handleGlobalKeyUp = (_event: any, webCode: string) => {
+      const category = getKeyCategory(webCode);
+      setActiveKeys((prev) => {
+        const next = new Set(prev);
+        next.delete(webCode);
+        return next;
+      });
+      triggerKeyUpAudio(webCode, category);
+    };
+
+    ipcRenderer.on('global-keydown', handleGlobalKeyDown);
+    ipcRenderer.on('global-keyup', handleGlobalKeyUp);
+
+    return () => {
+      ipcRenderer.removeListener('global-keydown', handleGlobalKeyDown);
+      ipcRenderer.removeListener('global-keyup', handleGlobalKeyUp);
+    };
+  }, [triggerKeyAudio, triggerKeyUpAudio]);
+
   // Initialize Desktop Global Hooks (Electron / Tauri Option B)
   useEffect(() => {
     const unsubscribe = initDesktopGlobalHooks((code, char) => {
@@ -177,15 +219,6 @@ export default function App() {
       unsubscribe();
     };
   }, [triggerKeyAudio]);
-
-  // Play Key Up Sound (Top-out return clack)
-  const triggerKeyUpAudio = useCallback(
-    (code: string, category: KeyCategory) => {
-      if (trialState.isExpired) return;
-      soundEngine.triggerKeyUp(code, currentProfileId, category, audioSettings);
-    },
-    [currentProfileId, audioSettings, trialState.isExpired]
-  );
 
   // Global Window Keydown / Keyup Listeners
   useEffect(() => {
@@ -298,7 +331,7 @@ export default function App() {
               <div className="flex items-center gap-2.5">
                 <h1 className="text-lg font-black text-white tracking-tight">Thocky</h1>
                 <span className="text-[10px] uppercase font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                  v1.0
+                  v1.0.2
                 </span>
               </div>
               <p className="text-xs text-slate-400 hidden sm:block font-medium">
@@ -494,4 +527,3 @@ export default function App() {
     </div>
   );
 }
-

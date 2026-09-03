@@ -1,25 +1,23 @@
-# Thocky ⌨️🔊
+# Thocky ⌨️🔊 (Standalone Prototype Branch)
 
-> **Zero-latency mechanical keyboard acoustic simulator & live typing companion powered by Web Audio DSP synthesis.**
+> **Zero-latency mechanical keyboard acoustic simulator & live typing companion powered by Web Audio DSP synthesis and native global OS hooks.**
 
-[![Microsoft Store](https://img.shields.io/badge/Microsoft_Store-Validated-0078D6?logo=windows)](https://partner.microsoft.com)
+[![Build: NSIS](https://img.shields.io/badge/Build-NSIS_.exe-blue?logo=windows)](https://electron.build/)
 [![Platform](https://img.shields.io/badge/Platform-Windows_10%2F11-blue?logo=windows10)](https://www.microsoft.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Thocky brings the satisfying tactile acoustics of custom mechanical switches directly to any Windows setup. Rather than relying on laggy pre-recorded audio samples, Thocky uses real-time procedural Web Audio DSP (Digital Signal Processing) synthesis to model the physical acoustics of switch bottom-outs, top-out returns, stabilizer thock, and housing resonance with zero latency.
+*Note: This branch contains the standalone `.exe` prototype of Thocky. It features a native C++ background keyboard listener via Electron IPC to allow keystroke audio synthesis even when the application is minimized or unfocused. For the strict sandboxed version, see the `main` branch (Microsoft Store AppX version).*
 
-Published by **Maximus Labs** for **Windows PC (Microsoft Store)**.
+Thocky brings the satisfying tactile acoustics of custom mechanical switches directly to any Windows setup. Rather than relying on laggy pre-recorded audio samples, Thocky uses real-time procedural Web Audio DSP (Digital Signal Processing) synthesis to model the physical acoustics of switch bottom-outs, top-out returns, stabilizer thock, and housing resonance with zero latency.
 
 ---
 
-## 💎 Pricing & Trial
+## 💎 Pricing & Trial (Prototype)
 
 | Plan | Price | Trial Period | Details |
 |---|---|---|---|
 | **1-Day Free Trial** | **$0.00** | 1 Day (24 Hours) | Full unrestricted access to all 6 switch sound engines, DSP tuning parameters, ambient audio mixing, and typing metrics upon first launch. |
-| **Yearly Subscription** | **$3.99 / year** *(~$0.33/month)* | 1 Day Free Included | Continuous unrestricted access, system-wide Windows background keystroke hook, all future switch acoustic profiles, and desktop updates. Managed securely via the Microsoft Store. |
-
-*Subscriptions and licensing are handled exclusively through the **Microsoft Store** In-App Purchase (IAP) system.*
+| **Yearly Subscription** | **$3.99 / year** *(~$0.33/month)* | 1 Day Free Included | Continuous unrestricted access to the system-wide background keystroke hook and all future switch acoustic profiles. |
 
 ---
 
@@ -42,39 +40,35 @@ Published by **Maximus Labs** for **Windows PC (Microsoft Store)**.
   - Lube level modifier (adjusts acoustic dampening and high-frequency roll-off).
   - Spacebar stabilizer thock amplifier.
   - Organic micro-pitch jitter (subtle frequency variation per keystroke for humanized acoustics).
-  - Stereo spatial panning (left-to-right acoustic positioning based on physical keyboard layout).
-  - Key-release return clack toggle, room reverb, and cafe background ambiance.
 
 - **⌨️ Keystroke Visualizer & Typing Sandbox**
   - Interactive visual keyboard displaying active keypress highlights and acoustic wave pulses.
   - Live typing test suite featuring real-time WPM, accuracy calculation, and keystroke streaks.
-  - Free typing scratchpad with instant audio feedback.
 
-- **🪟 Windows Store & Desktop Background Typing Hook**
-  - Official Microsoft Store AppX packaging by **Maximus Labs**.
-  - Operates quietly in the Windows system tray with lightweight background execution.
-  - System-wide global keyboard listener for mechanical switch sounds across Word, Discord, VS Code, and PC games.
+- **🪟 Advanced Background Typing Hook (Electron IPC)**
+  - System-wide global keyboard listener bypasses browser focus limitations.
+  - Implements native C++ bindings (`node-global-key-listener`) to capture OS-level keystrokes.
+  - Safely bridges global keystroke data to the React UI layer via secure Electron `ipcRenderer` channels.
+  - Operates quietly in the Windows system tray across Word, Discord, VS Code, and PC games.
 
 ---
 
-## 🔒 Permissions & Capabilities (`runFullTrust`)
+## 🔒 Security & Antivirus Notes
 
-Thocky is packaged as a Win32 desktop application using the Microsoft Store bridge framework.
-
-* **Capability:** `runFullTrust`
-* **Purpose:** Required to execute low-level system operations, specifically registering local background keyboard listeners and managing low-latency native audio streams.
-* **Privacy Assurance:** Thocky collects **zero telemetry, logs no keystrokes, and requires no external network connections.** All audio synthesis and keyboard hooks execute strictly offline on your local machine.
+This standalone build implements a global keyboard hook to function in the background. 
+* **Privacy Assurance:** Thocky collects **zero telemetry, logs no keystrokes, and requires no external network connections.** All audio synthesis and keyboard hooks execute strictly offline in local memory.
+* **Developer Note:** During local builds, strict antivirus software (like Windows Defender) may flag the `WinKeyServer.exe` dependency as a false positive due to its C++ keystroke-listening nature. Add a folder exclusion in Windows Security to successfully compile the `.exe`.
 
 ---
 
 ## 🛠️ Tech Stack
 
 - **Desktop Framework**: [Electron](https://www.electronjs.org/) + `electron-builder`
+- **Native OS Bridge**: `node-global-key-listener` (C++ to Node.js)
 - **Frontend**: [React](https://react.dev/) + [Vite](https://vitejs.dev/)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Audio Engine**: [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API) (Zero-latency procedural DSP synthesis)
-- **Distribution**: Microsoft Partner Center (AppX / Win32)
+- **Audio Engine**: [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
 
 ---
 
@@ -85,35 +79,38 @@ Thocky is packaged as a Win32 desktop application using the Microsoft Store brid
 - [Node.js](https://nodejs.org/) (version 18 or higher)
 - `npm` (or `pnpm` / `yarn`)
 
-### Installation & Development
+### Installation & Build Instructions
 
-1. **Clone the repository:**
+1. **Clone the repository (and switch to prototype branch):**
    ```bash
    git clone [https://github.com/MaximusLabs/thocky.git](https://github.com/MaximusLabs/thocky.git)
    cd thocky
+   git checkout prototype-global-hook
 
 2. **Install dependencies:**
     ```bash
     npm install
 
-3. **Start local development mode:**
+3. **Compile web assets:**
     ```bash 
-    npm install
-
-4. **Build Windows AppX Store Package:**
-    ```bash
     npm run build
 
+4. **Package the Standalone Windows Installer (.exe):**
+    ```bash
+    npx electron-builder --win nsis
+
+    //The compiled installer will be located in the dist-electron/ directory.
 
 
-## 📦 Windows AppX Identity Configuration
 
-Configured for automated Windows packaging via `electron-builder` matching official Microsoft Partner Center credentials, including the required Store tile assets and background formatting:
+## 📦 Electron-Builder NSIS Configuration
+
+Configured to build a standard Windows executable (.exe) utilizing relative paths for internal Vite asset routing:
 
 ```json
 {
   "build": {
-    "appId": "com.maximuslabs.thocky",
+    "appId": "com.maximuslabs.thocky.standalone",
     "productName": "Thocky",
     "directories": {
       "output": "dist-electron",
@@ -125,16 +122,8 @@ Configured for automated Windows packaging via `electron-builder` matching offic
       "package.json"
     ],
     "win": {
-      "target": ["appx"],
+      "target": ["nsis"],
       "icon": "build/icon.ico"
-    },
-    "appx": {
-      "identityName": "MaximusLabs.Thocky",
-      "publisher": "CN=F9B66ACC-8C31-4360-AE8B-D0A167BA1200",
-      "publisherDisplayName": "Maximus Labs",
-      "applicationId": "Thocky",
-      "backgroundColor": "#000000",
-      "showNameOnTiles": true
     }
   }
 }

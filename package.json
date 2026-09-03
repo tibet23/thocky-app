@@ -1,7 +1,7 @@
 {
   "name": "thocky",
   "private": true,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Real-time mechanical keyboard sound simulator",
   "author": "Maximus Labs",
   "main": "main.js",
